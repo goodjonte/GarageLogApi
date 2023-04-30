@@ -3,6 +3,7 @@
     public class Maintenance
     {
         public Guid Id { get; set; }
+        public Guid VehcileId { get; set; }
         public string? Name { get; set; }
         public DateTime? DueDate { get; set; }
         public int? DueKilometers { get; set; }

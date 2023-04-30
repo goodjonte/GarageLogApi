@@ -3,6 +3,7 @@
     public class Vehcile
     {
         public Guid Id { get; set; }
+        public Guid UserID { get; set; }
         public string? Name { get; set; }
         public string? Img { get; set; }
         public bool IsHours { get; set; }
