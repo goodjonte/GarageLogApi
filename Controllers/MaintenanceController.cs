@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using static GarageLog.Maintenance;
+﻿using GarageLog.Models;
+using Microsoft.AspNetCore.Mvc;
+using static GarageLog.Models.Maintenance;
 
 namespace GarageLog.Controllers
 {

@@ -1,10 +1,10 @@
-﻿namespace GarageLog
+﻿namespace GarageLog.Models
 {
     public class Maintenance
     {
         public Guid Id { get; set; }
         public string? Name { get; set; }
-        public DateOnly? DueDate { get; set; }
+        public DateTime? DueDate { get; set; }
         public int? DueKilometers { get; set; }
         public int? DueHours { get; set; }
         public string? Notes { get; set; }

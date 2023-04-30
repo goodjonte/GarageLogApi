@@ -1,9 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using GarageLog.Models;
+using Microsoft.Extensions.DependencyInjection;
+using GarageLog.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<GarageLogContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("GarageLogContext") ?? throw new InvalidOperationException("Connection string 'GarageLogContext' not found.")));
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

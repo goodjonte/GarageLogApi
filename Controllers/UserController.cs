@@ -1,3 +1,4 @@
+using GarageLog.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GarageLog.Controllers

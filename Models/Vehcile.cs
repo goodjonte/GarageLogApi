@@ -1,4 +1,4 @@
-﻿namespace GarageLog
+﻿namespace GarageLog.Models
 {
     public class Vehcile
     {
