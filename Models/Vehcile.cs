@@ -8,16 +8,18 @@
         public string? Img { get; set; }
         public bool IsHours { get; set; }
         public int? KilometersOrHours { get; set; }
-        public enum VehcileType
+        public VType VehcileType { get; set; }
+        public enum VType
         {
-            Car,
-            Motorbike,
-            Truck,
-            Tractor,
-            Bus,
-            Boat,
-            Plane,
-            Helicopter
+            Car = 0,
+            Motorbike = 1,
+            Truck = 2,
+            Tractor = 3,
+            Bus = 4,
+            Boat = 5,
+            Plane = 6,
+            Helicopter = 7,
+            Other = 20,
         }
     }
 }

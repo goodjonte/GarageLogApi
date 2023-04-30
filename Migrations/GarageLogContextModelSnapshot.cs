@@ -56,7 +56,7 @@ namespace GarageLog.Migrations
 
             modelBuilder.Entity("GarageLog.Models.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -88,6 +88,9 @@ namespace GarageLog.Migrations
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("VehcileType")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

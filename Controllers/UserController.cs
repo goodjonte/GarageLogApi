@@ -24,5 +24,18 @@ namespace GarageLog.Controllers
 
             return await _context.User.ToListAsync();
         }
+
+        [HttpPost(Name = "CreateUser")]
+        public async Task<User> Post([Bind("Id, Email")] User user)
+        {
+            if (ModelState.IsValid)
+            {
+                user.Id = Guid.NewGuid();
+                _context.Add(user);
+                await _context.SaveChangesAsync();
+                return user;
+            }
+            return user;
+        }
     }
 }

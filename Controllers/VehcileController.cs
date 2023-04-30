@@ -25,5 +25,18 @@ namespace GarageLog.Controllers
 
             return await _context.Vehcile.ToListAsync();
         }
+
+        [HttpPost(Name = "CreateVehcile")]
+        public async Task<Vehcile> Post([Bind("Id, UserID, Name, Img, IsHours, KilometersOrHours, VehcileType")] Vehcile vehcile)
+        {
+            if (ModelState.IsValid)
+            {
+                vehcile.Id = Guid.NewGuid();
+                _context.Add(vehcile);
+                await _context.SaveChangesAsync();
+                return vehcile;
+            }
+            return vehcile;
+        }
     }
 }

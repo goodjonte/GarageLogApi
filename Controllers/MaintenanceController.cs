@@ -25,5 +25,18 @@ namespace GarageLog.Controllers
             
             return await _context.Maintenance.ToListAsync();
         }
+
+        [HttpPost(Name = "CreateMaintenance")]
+        public async Task<Maintenance> Post([Bind("Id, VehcileId, Name, DueDate, DueKilometers, DueHours, Notes, MaintType, Email")] Maintenance maintenance)
+        {
+            if (ModelState.IsValid)
+            {
+                maintenance.Id = Guid.NewGuid();
+                _context.Add(maintenance);
+                await _context.SaveChangesAsync();
+                return maintenance;
+            }
+            return maintenance;
+        }
     }
 }
