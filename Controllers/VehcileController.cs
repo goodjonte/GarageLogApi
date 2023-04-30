@@ -1,6 +1,8 @@
-﻿using GarageLog.Models;
+﻿using GarageLog.Data;
+using GarageLog.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GarageLog.Controllers
 {
@@ -8,24 +10,20 @@ namespace GarageLog.Controllers
     [Route("[controller]")]
     public class VehcileController : ControllerBase
     {
+        public GarageLogContext _context { get; set; }
         private readonly ILogger<VehcileController> _logger;
 
-        public VehcileController(ILogger<VehcileController> logger)
+        public VehcileController(ILogger<VehcileController> logger, GarageLogContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         [HttpGet(Name = "GetVehciles")]
-        public IEnumerable<Vehcile> Get()
+        public async Task<List<Vehcile>> Get()
         {
-            return new Vehcile[]
-            {
-                new Vehcile
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Test"
-                }
-            };
+
+            return await _context.Vehcile.ToListAsync();
         }
     }
 }

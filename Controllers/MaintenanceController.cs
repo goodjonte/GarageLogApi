@@ -1,6 +1,8 @@
 ﻿using GarageLog.Models;
+using GarageLog.Data;
 using Microsoft.AspNetCore.Mvc;
 using static GarageLog.Models.Maintenance;
+using Microsoft.EntityFrameworkCore;
 
 namespace GarageLog.Controllers
 {
@@ -8,25 +10,20 @@ namespace GarageLog.Controllers
     [Route("[controller]")]
     public class MaintenanceController : Controller
     {
+        public GarageLogContext _context { get; set; }
         private readonly ILogger<MaintenanceController> _logger;
 
-        public MaintenanceController(ILogger<MaintenanceController> logger)
+        public MaintenanceController(ILogger<MaintenanceController> logger, GarageLogContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        [HttpGet(Name = "GetMaint")]
-        public IEnumerable<Maintenance> Get()
+        [HttpGet(Name = "GetMaintenance")]
+        public async Task<List<Maintenance>> Get()
         {
-            return new Maintenance[]
-            {
-                new Maintenance
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Test",
-                    MaintType = MType.AirFilter
-                }
-            };
+            
+            return await _context.Maintenance.ToListAsync();
         }
     }
 }
