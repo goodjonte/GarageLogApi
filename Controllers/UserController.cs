@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GarageLog.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         public GarageLogContext _context { get; set; }
@@ -18,24 +18,37 @@ namespace GarageLog.Controllers
             _context = context;
         }
 
-        [HttpGet(Name = "GetUsers")]
-        public async Task<List<User>> Get()
+        //Get A User
+        [HttpGet("{email}")]
+        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get(string email)
         {
-
-            return await _context.User.ToListAsync();
+            var user = await _context.User.Where( u => u.Email == email).ToListAsync();
+            if (user[0] == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
         }
 
-        [HttpPost(Name = "CreateUser")]
-        public async Task<User> Post([Bind("Id, Email")] User user)
+        //Create A User
+        [HttpPost("{email}")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> Post(string email)
         {
-            if (ModelState.IsValid)
+            List<User> userList = await _context.User.Where(u => u.Email == email).ToListAsync();
+            if (userList.Count < 1)
             {
-                user.Id = Guid.NewGuid();
-                _context.Add(user);
+                User newUser = new User { Id = Guid.NewGuid(), Email = email };
+                _context.User.Add(newUser);
                 await _context.SaveChangesAsync();
-                return user;
+                return Accepted();
             }
-            return user;
+            
+            return Conflict();
+            
         }
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GarageLog.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class VehcileController : ControllerBase
     {
         public GarageLogContext _context { get; set; }
@@ -19,15 +19,24 @@ namespace GarageLog.Controllers
             _context = context;
         }
 
-        [HttpGet(Name = "GetVehciles")]
-        public async Task<List<Vehcile>> Get()
+        //Get A Vehcile
+        [HttpGet("{userId}")]
+        [ProducesResponseType(typeof(List<Vehcile>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetVehciles(Guid userId)
         {
 
-            return await _context.Vehcile.ToListAsync();
+            List<Vehcile> vehciles = await _context.Vehcile.Where(v => v.UserID == userId).ToListAsync();
+            if (vehciles.Count < 1)
+            {
+                return NotFound();
+            }
+            return Ok(vehciles);
         }
 
+        //Create A Vehcile
         [HttpPost(Name = "CreateVehcile")]
-        public async Task<Vehcile> Post([Bind("Id, UserID, Name, Img, IsHours, KilometersOrHours, VehcileType")] Vehcile vehcile)
+        public async Task<Vehcile> CreateVehcile([Bind("Id, UserID, Name, Img, IsHours, KilometersOrHours, VehcileType")] Vehcile vehcile)
         {
             if (ModelState.IsValid)
             {
@@ -37,6 +46,24 @@ namespace GarageLog.Controllers
                 return vehcile;
             }
             return vehcile;
+        }
+
+        //Delete A Vehcile
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteVehcile(Guid id)
+        {
+            if (_context.Vehcile == null)
+            {
+                return NotFound();
+            }
+            var vehcile = await _context.Vehcile.FindAsync(id);
+            if (vehcile != null)
+            {
+                _context.Vehcile.Remove(vehcile);
+            }
+
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
