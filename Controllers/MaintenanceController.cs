@@ -64,5 +64,12 @@ namespace GarageLog.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        //Edit a Maintenance item
+        //[HttpPost(Name = "EditMaintenance")]
+        //public async Task<Maintenance> EditMaintenance()
+        //{
+            
+        //}
     }
 }
