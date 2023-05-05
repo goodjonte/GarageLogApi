@@ -1,7 +1,12 @@
 using GarageLog.Data;
+using GarageLog.DTO;
 using GarageLog.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace GarageLog.Controllers
 {
@@ -9,46 +14,118 @@ namespace GarageLog.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
+        public static User user = new User();
+        public readonly IConfiguration _configuration;
         public GarageLogContext _context { get; set; }
-        private readonly ILogger<UserController> _logger;
 
-        public UserController(ILogger<UserController> logger, GarageLogContext context)
+        public UserController(IConfiguration configuration, GarageLogContext context)
         {
-            _logger = logger;
+            _configuration = configuration;
             _context = context;
         }
 
-        //Get A User
-        [HttpGet("{email}")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Get(string email)
+ 
+        
+        [HttpPost("register")]
+        public async Task<ActionResult<User>> Register(UserDTO request)
         {
-            var user = await _context.User.Where( u => u.Email == email).ToListAsync();
-            if (user[0] == null)
+            if (request.Username == "" || request.Password == "" || request.Username == null || request.Password == null)//Checks if the username or password is null
             {
-                return NotFound();
+                return BadRequest("Please enter both a Username and Password!");
             }
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);//Takes in the password and creates the hash and salt
+
+            //Set all the user properties (would push to db but this is example project)
+            user.Username = request.Username;
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            if (_context.User.Any(x => x.Username == user.Username))//Checks if the username is already taken
+            {
+                return BadRequest("Username already taken!");
+            }
+
+            _context.User.Add(user);//Adds the user to the db context
+            await _context.SaveChangesAsync();//Saves the changes to the db
+
             return Ok(user);
+
         }
 
-        //Create A User
-        [HttpPost("{email}")]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> Post(string email)
+        //Login Post
+        [HttpPost("login")]
+        public ActionResult<string> Login(UserDTO request)
         {
-            List<User> userList = await _context.User.Where(u => u.Email == email).ToListAsync();
-            if (userList.Count < 1)
+            bool UserExists = _context.User.Any(x => x.Username == request.Username);
+            if (UserExists == false)//Checks if username is valid
             {
-                User newUser = new User { Id = Guid.NewGuid(), Email = email };
-                _context.User.Add(newUser);
-                await _context.SaveChangesAsync();
-                return Accepted();
+                return BadRequest("User not found!");
             }
-            
-            return Conflict();
-            
+
+            var userLoggingIn = _context.User.FirstOrDefault(x => x.Username == request.Username);//Gets the user from the db
+            if (userLoggingIn != null)
+            {
+                if (!VerifyPasswordHash(request.Password, userLoggingIn.PasswordHash, userLoggingIn.PasswordSalt))//checks if password is valid(hash and salt would come from db in real project(the users row))
+                {
+                    return BadRequest("Wrong Password");
+                }
+            }
+            string token = CreateToken(user);
+
+            return Ok(token);
         }
+
+        //Creates the JWT token Based off the user
+        private string CreateToken(User user)
+        {
+            List<Claim> claims = new List<Claim>//Creates claims to assign to the jwt token 
+            {
+                new Claim(ClaimTypes.Name, user.Username)
+            };
+
+            var keyToken = _configuration.GetSection("AppSettings:Token").Value;
+            if (keyToken != null)
+            {
+                //Creates the key from the token created in appsettings (also turns it into a byte array first)
+                var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(keyToken));
+
+                var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature); //creats the creds (pretty much just signature to the key)
+
+                var token = new JwtSecurityToken( //Initialisez the JWT token (putting everything together)
+                    claims: claims,
+                    expires: DateTime.Now.AddDays(1),//Here is the token expiry (Currently just adding 24hours from creation)
+                    signingCredentials: cred
+                    );
+
+                var jwt = new JwtSecurityTokenHandler().WriteToken(token); //Actualty writes the token now it can be passed to the client
+
+                return jwt;
+            }
+            return "No KeyToken in Appsettings";
+
+        }
+
+
+        //creates password hash and salt sets the out params to the created hash and salt (would need to return in actual example and add to db context)
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        //Creates a Hash from the entered password then compares it to the existing hash (Would be from db in real example)
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+
+                return computedHash.SequenceEqual(passwordHash);
+            }
+        }
+
     }
 }

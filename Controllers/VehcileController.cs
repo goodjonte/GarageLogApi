@@ -36,30 +36,30 @@ namespace GarageLog.Controllers
 
         //Create A Vehcile
         [HttpPost(Name = "CreateVehcile")]
-        public async Task<Vehcile> CreateVehcile([Bind("Id, UserID, Name, Img, IsHours, KilometersOrHours, VehcileType")] Vehcile vehcile)
+        public async Task<string> CreateVehcile([Bind("Id, UserID, Name, Img, IsHours, KilometersOrHours, VehcileType")] Vehcile vehcile)
         {
             if (ModelState.IsValid)
             {
                 vehcile.Id = Guid.NewGuid();
                 _context.Add(vehcile);
                 await _context.SaveChangesAsync();
-                return vehcile;
+                return "Success";
             }
-            return vehcile;
+            return "ModelState Not Valid";
         }
 
         //Delete A Vehcile
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehcile(Guid id)
         {
-            if (_context.Vehcile == null)
-            {
-                return NotFound();
-            }
             var vehcile = await _context.Vehcile.FindAsync(id);
             if (vehcile != null)
             {
                 _context.Vehcile.Remove(vehcile);
+            }
+            if (vehcile == null)
+            {
+                return NotFound();
             }
 
             await _context.SaveChangesAsync();

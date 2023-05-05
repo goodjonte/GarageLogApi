@@ -19,7 +19,7 @@
             Boat = 5,
             Plane = 6,
             Helicopter = 7,
-            Other = 20,
+            Other = 8,
         }
     }
 }
