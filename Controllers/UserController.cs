@@ -14,18 +14,21 @@ namespace GarageLog.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
+        //FIELDS and PROPERTIES
         public static User user = new User();
         public readonly IConfiguration _configuration;
         public GarageLogContext _context { get; set; }
 
+        //CONSTRUCTOR
         public UserController(IConfiguration configuration, GarageLogContext context)
         {
             _configuration = configuration;
             _context = context;
         }
 
- 
-        
+        //METHODS
+        //api/User/register POST
+        //Register User
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserDTO request)
         {
@@ -53,7 +56,8 @@ namespace GarageLog.Controllers
 
         }
 
-        //Login Post
+        //api/User/login POST
+        //Login User
         [HttpPost("login")]
         public ActionResult<string> Login(UserDTO request)
         {

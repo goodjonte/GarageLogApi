@@ -10,15 +10,19 @@ namespace GarageLog.Controllers
     [Route("api/[controller]")]
     public class MaintenanceController : Controller
     {
+        //FIELDS and PROPERTIES
         public GarageLogContext _context { get; set; }
         private readonly ILogger<MaintenanceController> _logger;
 
+        //CONSTRUCTOR
         public MaintenanceController(ILogger<MaintenanceController> logger, GarageLogContext context)
         {
             _logger = logger;
             _context = context;
         }
 
+        //METHODS
+        //api/Maintenance/{vehcileId} GET
         //Get a Maintenance item
         [HttpGet("{vehcileId}")]
         [ProducesResponseType(typeof(List<Maintenance>), StatusCodes.Status200OK)]
@@ -33,6 +37,7 @@ namespace GarageLog.Controllers
             return Ok(maintenances);
         }
 
+        //api/Maintenance POST
         //Create a Maintenance item
         [HttpPost(Name = "CreateMaintenance")]
         public async Task<string> CreateMaintenance(Maintenance maintenance)
@@ -47,6 +52,7 @@ namespace GarageLog.Controllers
             return "Model State Not Valid!";
         }
 
+        //api/Maintenance/{id} DELETE
         //Delete a Maintenance item
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMaintenance(Guid id)
@@ -64,12 +70,5 @@ namespace GarageLog.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-
-        //Edit a Maintenance item
-        //[HttpPost(Name = "EditMaintenance")]
-        //public async Task<Maintenance> EditMaintenance()
-        //{
-            
-        //}
     }
 }

@@ -15,16 +15,22 @@ namespace GarageLog.Controllers
     [Route("api/[controller]")]
     public class VehcileController : ControllerBase
     {
+        //FIELDS and PROPERTIES
         private Vehcile vehcile1= new Vehcile();
         public readonly IConfiguration _configuration;
         public GarageLogContext _context { get; set; }
+
+        //CONSTRUCTOR
         public VehcileController(IConfiguration configuration, GarageLogContext context)
         {
             _configuration = configuration;
             _context = context;
         }
 
-        //Get A Vehcile
+        //METHODS
+
+        //api/Vehcile GET
+        //Get Users Vehciles
         [HttpGet(Name = "GetVehciles")]
         [ProducesResponseType(typeof(List<Vehcile>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -58,6 +64,7 @@ namespace GarageLog.Controllers
             return NotFound();
         }
 
+        //api/Vehcile POST
         //Create A Vehcile
         [HttpPost(Name = "CreateVehcile")]
         public async Task<string> CreateVehcile(VehcileDTO newVehcile)
@@ -96,6 +103,7 @@ namespace GarageLog.Controllers
             return "ModelState Not Valid";
         }
 
+        //api/Vehcile/{vehcileId} GET
         //Get A Singular Vehcile
         [HttpGet("{vehcileId}")]
         public async Task<IActionResult> GetAVehcile(Guid vehcileId)
@@ -114,6 +122,8 @@ namespace GarageLog.Controllers
             return NoContent();
         }
 
+
+        //api/Vehcile/{id} DELETE
         //Delete A Vehcile
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehcile(Guid id)
@@ -132,6 +142,7 @@ namespace GarageLog.Controllers
             return NoContent();
         }
 
+        //Creates a TokenValidationParameters instance to use to validate the JWT token
         private TokenValidationParameters GetValidationParameters()
         {
             var key = _configuration.GetSection("AppSettings:Token").Value;
@@ -141,11 +152,10 @@ namespace GarageLog.Controllers
                 return new TokenValidationParameters()
                 {
                     ValidateLifetime = false,
-                    ValidateAudience = false, // Because there is no audiance in the generated token
-                    ValidateIssuer = false,   // Because there is no issuer in the generated token
+                    ValidateAudience = false, 
                     ValidIssuer = "GarageLog",
                     ValidAudience = "GarageLog",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)) // The same key as the one that generate the token
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)) 
                 };
             }
             else

@@ -11,6 +11,8 @@ var CORSAllowSpecificOrigins = "_CORSAllowed";
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<GarageLogContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("GarageLogContext") ?? throw new InvalidOperationException("Connection string 'GarageLogContext' not found.")));
+
+//CORS HERE
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CORSAllowSpecificOrigins,
