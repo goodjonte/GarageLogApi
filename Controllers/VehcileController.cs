@@ -96,6 +96,24 @@ namespace GarageLog.Controllers
             return "ModelState Not Valid";
         }
 
+        //Get A Singular Vehcile
+        [HttpGet("{vehcileId}")]
+        public async Task<IActionResult> GetAVehcile(Guid vehcileId)
+        {
+            var vehcile = await _context.Vehcile.FindAsync(vehcileId);
+            if (vehcile != null)
+            {
+                return Ok(vehcile);
+            }
+            if (vehcile == null)
+            {
+                return NotFound();
+            }
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
         //Delete A Vehcile
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehcile(Guid id)
