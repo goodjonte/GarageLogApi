@@ -35,16 +35,16 @@ namespace GarageLog.Controllers
 
         //Create a Maintenance item
         [HttpPost(Name = "CreateMaintenance")]
-        public async Task<Maintenance> CreateMaintenance([Bind("Id, VehcileId, Name, DueDate, DueKilometers, DueHours, Notes, MaintType, Email")] Maintenance maintenance)
+        public async Task<string> CreateMaintenance(Maintenance maintenance)
         {
             if (ModelState.IsValid)
             {
                 maintenance.Id = Guid.NewGuid();
                 _context.Add(maintenance);
                 await _context.SaveChangesAsync();
-                return maintenance;
+                return "Maintenenace Log Created";
             }
-            return maintenance;
+            return "Model State Not Valid!";
         }
 
         //Delete a Maintenance item

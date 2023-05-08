@@ -39,6 +39,7 @@ namespace GarageLog.Controllers
             user.Username = request.Username;
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
+            user.Id = Guid.NewGuid();
 
             if (_context.User.Any(x => x.Username == user.Username))//Checks if the username is already taken
             {
@@ -70,17 +71,17 @@ namespace GarageLog.Controllers
                     return BadRequest("Wrong Password");
                 }
             }
-            string token = CreateToken(user);
+            string token = CreateToken(request);
 
             return Ok(token);
         }
 
         //Creates the JWT token Based off the user
-        private string CreateToken(User user)
+        private string CreateToken(UserDTO request)
         {
             List<Claim> claims = new List<Claim>//Creates claims to assign to the jwt token 
             {
-                new Claim(ClaimTypes.Name, user.Username)
+                new Claim(ClaimTypes.Name, request.Username)
             };
 
             var keyToken = _configuration.GetSection("AppSettings:Token").Value;
@@ -93,6 +94,8 @@ namespace GarageLog.Controllers
 
                 var token = new JwtSecurityToken( //Initialisez the JWT token (putting everything together)
                     claims: claims,
+                    issuer: "GarageLog",
+                    audience: "GarageLog",
                     expires: DateTime.Now.AddDays(1),//Here is the token expiry (Currently just adding 24hours from creation)
                     signingCredentials: cred
                     );

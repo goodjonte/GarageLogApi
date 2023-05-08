@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GarageLog.Migrations
 {
     [DbContext(typeof(GarageLogContext))]
-    [Migration("20230505051757_GarageLogin")]
-    partial class GarageLogin
+    [Migration("20230507092254_GarageLog")]
+    partial class GarageLog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,11 +31,17 @@ namespace GarageLog.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("DueDate")
+                    b.Property<bool>("DateBool")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("DoneAtDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DueHours")
+                    b.Property<int?>("DoneAtKilometers")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("DueKilometers")
                         .HasColumnType("int");
