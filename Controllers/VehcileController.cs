@@ -142,6 +142,28 @@ namespace GarageLog.Controllers
             return NoContent();
         }
 
+        //api/Vehcile/ POST
+        //Update A Vehciles Mileage/Kilometers
+        [HttpPost("EditMileage")]
+        public async Task<IActionResult> UpdateVehcile(MileageDTO mileageObj)
+        {
+            
+            if (mileageObj != null)
+            {
+                var vehcile = await _context.Vehcile.FindAsync(mileageObj.VehcileId);
+            
+            if (vehcile != null)
+            {
+                vehcile.KilometersOrHours = mileageObj.Mileage;
+                _context.Vehcile.Update(vehcile);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            }
+            return NotFound();
+           
+        }
+
         //Creates a TokenValidationParameters instance to use to validate the JWT token
         private TokenValidationParameters GetValidationParameters()
         {
